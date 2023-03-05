@@ -14,5 +14,8 @@ trim_trailing_whitespace = false
 [*.{yml,yaml}]
 indent_size = 2
 
-[Makefile]
+[docker-php-entrypoint*]
+indent_size = 2
+
+[{Makefile,go.mod,*.go}]
 indent_style = tab

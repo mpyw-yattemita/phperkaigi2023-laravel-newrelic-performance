@@ -1,0 +1,145 @@
+name: Kubectl Workflow
+
+on:
+  workflow_call:
+    inputs:
+      kubectl: # 'set image' か 'apply'
+        type: string
+        required: true
+      VITE_NEW_RELIC_URL:
+        type: string
+        default: ${{ vars.VITE_NEW_RELIC_URL }}
+      VITE_GITHUB_URL:
+        type: string
+        default: ${{ github.server_url }}/${{ github.repository }}
+      K8S_LARAVEL_APP_URL:
+        type: string
+        default: ${{ vars.K8S_LARAVEL_APP_URL }}
+    secrets:
+      IAM_ROLE_ARN:
+        required: true
+      K8S_CLUSTER_NAME:
+        required: true
+      K8S_NAMESPACE:
+        required: true
+      K8S_IMAGE_REPOSITORY_PHP_LARAVEL:
+        required: true
+      K8S_SECRET_BASE64_MYSQL_PASSWORD:
+        required: true
+      K8S_SECRET_BASE64_MYSQL_ROOT_PASSWORD:
+        required: true
+      K8S_SECRET_BASE64_LARAVEL_ENCRYPTION_KEY:
+        required: true
+      K8S_SECRET_BASE64_NEW_RELIC_LICENSE_KEY:
+        required: true
+      NEW_RELIC_API_KEY:
+        required: true
+      NEW_RELIC_DEPLOYMENT_ENTITY_GUID:
+        required: true
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  kubectl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: ap-northeast-1
+          role-to-assume: ${{ secrets.IAM_ROLE_ARN }}
+
+      - name: AWS ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.25.3'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Docker build and Push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: infra/docker/php/Dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # このオプションは JavaScript でパースされており，シェルのパース規則と異なるので，意図的にダブルクオートは使わない
+          build-args: |
+            NEW_RELIC_AGENT_VERSION=10.6.0.318
+            VITE_GITHUB_URL=${{ inputs.VITE_GITHUB_URL }}
+            VITE_NEW_RELIC_URL=${{ inputs.VITE_NEW_RELIC_URL }}
+          tags: |
+            ${{ secrets.K8S_IMAGE_REPOSITORY_PHP_LARAVEL }}:${{ github.sha }}
+            ${{ secrets.K8S_IMAGE_REPOSITORY_PHP_LARAVEL }}:latest
+
+      - name: Run "eks update-kubeconfig"
+        run: |
+          aws eks update-kubeconfig \
+            --region ap-northeast-1 \
+            --name "${{ secrets.K8S_CLUSTER_NAME }}"
+
+      - name: Validate inputs.kubectl value
+        if: ${{ inputs.kubectl != 'set image' && inputs.kubectl != 'apply' }}
+        run: |
+          echo >&2 "Invalid Value for inputs.kubectl: ${{ inputs.kubectl }}"
+          exit 1
+
+      - name: Run "kubectl set image"
+        if: ${{ inputs.kubectl == 'set image' }}
+        run: |
+          kubectl set image \
+            -n ${{ secrets.K8S_NAMESPACE }} \
+            deployment/php-laravel \
+            php-laravel="${{ secrets.K8S_IMAGE_REPOSITORY_PHP_LARAVEL }}:${{ github.sha }}" \
+            php-laravel-initializer="${{ secrets.K8S_IMAGE_REPOSITORY_PHP_LARAVEL }}:${{ github.sha }}"
+
+      - name: Generate "kubectl apply" template
+        id: templating
+        if: ${{ inputs.kubectl == 'apply' }}
+        uses: actions/github-script@v6
+        env:
+          K8S_IMAGE_REPOSITORY_PHP_LARAVEL: ${{ secrets.K8S_IMAGE_REPOSITORY_PHP_LARAVEL }}
+          K8S_LARAVEL_APP_URL: ${{ inputs.K8S_LARAVEL_APP_URL }}
+          K8S_SECRET_BASE64_MYSQL_PASSWORD: ${{ secrets.K8S_SECRET_BASE64_MYSQL_PASSWORD }}
+          K8S_SECRET_BASE64_MYSQL_ROOT_PASSWORD: ${{ secrets.K8S_SECRET_BASE64_MYSQL_ROOT_PASSWORD }}
+          K8S_SECRET_BASE64_LARAVEL_ENCRYPTION_KEY: ${{ secrets.K8S_SECRET_BASE64_LARAVEL_ENCRYPTION_KEY }}
+          K8S_SECRET_BASE64_NEW_RELIC_LICENSE_KEY: ${{ secrets.K8S_SECRET_BASE64_NEW_RELIC_LICENSE_KEY }}
+        with:
+          script: |
+            const { exitCode, stdout, stderr } = await exec.getExecOutput('./infra/k8s/interpolate.sh');
+            process.stdout.write(stdout);
+            process.stderr.write(stderr);
+            if (exitCode !== 0) {
+              throw new Error('interpolation failed');
+            }
+            core.setOutput('template', stdout);
+
+      - name: Run "kubectl apply"
+        if: ${{ inputs.kubectl == 'apply' }}
+        env:
+          TEMPLATE: ${{ steps.templating.outputs.template }}
+        run: |
+          kubectl apply \
+            -n ${{ secrets.K8S_NAMESPACE }} \
+            -f - <<< "$TEMPLATE"
+
+      - name: Record Change Tracking
+        uses: newrelic/deployment-marker-action@v2.1.0
+        with:
+          apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
+          guid: ${{ secrets.NEW_RELIC_DEPLOYMENT_ENTITY_GUID }}
+          version: "${{ github.sha }}"
+          user: "${{ github.actor }}"
+          description: "${{ github.event.head_commit.message }}"
+          commit: "${{ github.sha }}"

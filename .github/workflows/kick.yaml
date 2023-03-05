@@ -1,0 +1,21 @@
+name: Kick APIs
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+jobs:
+  kick:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 19.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '19.x'
+      - name: Send Requests
+        env:
+          K8S_LARAVEL_APP_URL: ${{ vars.K8S_LARAVEL_APP_URL }}
+        run: |
+          node .github/workflows/script.js

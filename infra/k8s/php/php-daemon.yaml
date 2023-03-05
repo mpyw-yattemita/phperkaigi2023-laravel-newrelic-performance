@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newrelic-php-daemon
+  labels:
+    app: newrelic-php-daemon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: newrelic-php-daemon
+  template:
+    metadata:
+      labels:
+        app: newrelic-php-daemon
+    spec:
+      containers:
+        - name: newrelic-php-daemon
+          image: newrelic/php-daemon:10.6.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 31339
+          livenessProbe:
+            tcpSocket:
+              port: 31339
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: newrelic-php-daemon-service
+spec:
+  type: ClusterIP
+  selector:
+    app: newrelic-php-daemon
+  ports:
+    - protocol: TCP
+      port: 31339
+      targetPort: 31339

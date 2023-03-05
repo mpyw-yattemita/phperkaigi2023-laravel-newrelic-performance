@@ -1,0 +1,18 @@
+name: Kubectl Apply
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  kubectl-apply:
+    uses: ./.github/workflows/kubectl.yaml
+    with:
+      kubectl: apply
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: read

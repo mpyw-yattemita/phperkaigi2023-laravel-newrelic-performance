@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# set newrelic.enabled directive from $NEW_RELIC_ENABLED
+set -- "$@" -d"newrelic.enabled=${NEW_RELIC_ENABLED}"
+
+# set newrelic.license directive from $NEW_RELIC_LICENSE_KEY
+set -- "$@" -d"newrelic.license=${NEW_RELIC_LICENSE_KEY}"
+
+# dynamically enable xdebug according to $XDEBUG_ENABLED
+if [ "${XDEBUG_ENABLED}" != '0' ] && [ "${XDEBUG_ENABLED}" != 'false' ]; then
+  set -- "$@" -d'zend_extension=xdebug.so'
+fi
+
+exec docker-php-entrypoint "$@"

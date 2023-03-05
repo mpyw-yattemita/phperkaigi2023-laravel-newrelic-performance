@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::fallback(function () {
+    if (extension_loaded('newrelic')) {
+        newrelic_name_transaction('Home');
+    }
+    return view('index');
 });

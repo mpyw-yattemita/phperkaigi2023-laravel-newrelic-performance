@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-laravel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-laravel
+  template:
+    metadata:
+      labels:
+        app: php-laravel
+    spec:
+      # /workspace/public を共有するためにこうしている
+      initContainers:
+        - name: php-laravel-initializer
+          image: ${K8S_IMAGE_REPOSITORY_PHP_LARAVEL}
+          command: ["sh", "-c", "cp -a /workspace/public/* /mnt/public/"]
+          args: []
+          volumeMounts:
+            - mountPath: /mnt/public/
+              name: replicated-public
+      containers:
+        - name: nginx
+          image: nginx:1.22
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/
+              name: nginx-conf
+            - mountPath: /workspace/public
+              name: replicated-public
+        - name: php-laravel
+          image: ${K8S_IMAGE_REPOSITORY_PHP_LARAVEL}
+          ports:
+            - containerPort: 9000
+          env:
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: encryption_key
+                  name: php-laravel
+            - name: APP_URL
+              value: ${K8S_LARAVEL_APP_URL}
+            - name: DB_HOST
+              value: mysqldb
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USERNAME
+              value: phper
+            - name: DB_DATABASE
+              value: laravel
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: mysql-credentials
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: license_key
+                  name: php-laravel
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf
+            items:
+              - key: nginx.cloud.conf
+                path: default.conf
+        - name: replicated-public
+          emptyDir: {}

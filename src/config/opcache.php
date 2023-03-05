@@ -1,0 +1,41 @@
+<?php
+
+return [
+    'url' => 'localhost:8002',
+    'prefix' => 'opcache-api',
+    'verify' => true,
+    'headers' => [
+        'Accept' => 'application/json',
+    ],
+    'directories' => [
+        base_path('app'),
+        base_path('bootstrap'),
+        base_path('config'),
+        base_path('public'),
+        base_path('resources/lang'),
+        base_path('routes'),
+        base_path('storage/framework/views'),
+        base_path('vendor/asm89/stack-cors'),
+        base_path('vendor/composer'),
+        base_path('vendor/fruitcake/laravel-cors'),
+        base_path('vendor/laravel/framework'),
+        base_path('vendor/monolog'),
+        base_path('vendor/nesbot/carbon'),
+        base_path('vendor/psr'),
+        base_path('vendor/symfony'),
+        base_path('vendor/vlucas/phpdotenv'),
+    ],
+    'exclude' => [
+        'test',
+        'Test',
+        'tests',
+        'Tests',
+        'stub',
+        'Stub',
+        'stubs',
+        'Stubs',
+        'dumper',
+        'Dumper',
+        'Autoload',
+    ],
+];

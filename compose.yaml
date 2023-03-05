@@ -1,0 +1,123 @@
+services:
+  app:
+    image: phperkaigi2023-app
+    build:
+      context: .
+      dockerfile: ./infra/docker/php/Dockerfile
+      target: php_fpm_customized_with_xdebug
+      args:
+        NEW_RELIC_AGENT_VERSION: 10.6.0.318
+        VITE_GITHUB_URL: ${VITE_GITHUB_URL:-https://github.com/mpyw-yattemita/phperkaigi2023-laravel-newrelic-performance}
+        VITE_NEW_RELIC_URL: ${VITE_NEW_RELIC_URL:-https://one.newrelic.com/nr1-core}
+    entrypoint: docker-php-entrypoint-local
+    volumes:
+      - type: bind
+        source: ./src
+        target: /workspace
+        consistency: cached
+      - type: volume
+        source: psysh-store
+        target: /root/.config/psysh
+        volume:
+          nocopy: true
+    configs:
+      - source: docker-php-entrypoint-local
+        target: /usr/local/bin/docker-php-entrypoint-local
+      - source: php_ini
+        target: /usr/local/etc/php/conf.d/zzz-php.ini
+      - source: www_conf
+        target: /usr/local/etc/php-fpm.d/zzz-www.conf
+      - source: php_local_ini
+        target: /usr/local/etc/php/conf.d/zzzz-php.custom.ini
+      - source: www_local_conf
+        target: /usr/local/etc/php-fpm.d/zzzz-www.custom.conf
+    environment:
+      APP_ENV: local
+      APP_KEY: ${APP_KEY}
+      APP_DEBUG: 'true'
+      APP_URL: http://localhost
+      LOG_LEVEL: debug
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: laravel
+      DB_USERNAME: phper
+      DB_PASSWORD: secret
+      NEW_RELIC_ENABLED: ${NEW_RELIC_ENABLED:-false}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:-}
+      XDEBUG_ENABLED: ${XDEBUG_ENABLED:-false}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-}
+
+  web:
+    image: nginx:1.22
+    ports:
+      - target: 80
+        published: ${WEB_PUBLISHED_PORT:-80}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./src
+        target: /workspace
+        consistency: cached
+    configs:
+      - source: nginx_local_conf
+        target: /etc/nginx/conf.d/default.conf
+    environment:
+      TZ: UTC
+    depends_on:
+      - app
+
+  db:
+    image: mysql/mysql-server:8.0
+    ports:
+      - target: 3306
+        published: ${DB_PUBLISHED_PORT:-3306}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: volume
+        source: db-store
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
+    environment:
+      TZ: UTC
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: phper
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+
+  new-relic-infrastructure:
+    image: newrelic/infrastructure:latest
+    hostname: newrelic-infra-phperkaigi2023
+    network_mode: host
+    cap_add:
+      - SYS_PTRACE
+    privileged: true
+    pid: host
+    volumes:
+      - /:/host:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      NRIA_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:-}
+
+  newrelic-php-daemon:
+    image: newrelic/php-daemon:10.6.0
+
+configs:
+  docker-php-entrypoint-local:
+    file: ./infra/docker/php/docker-php-entrypoint-local
+  php_ini:
+    file: ./infra/docker/php/php.ini
+  www_conf:
+    file: ./infra/docker/php/www.conf
+  php_local_ini:
+    file: ./infra/docker/php/php-ini.d/php.local.ini
+  www_local_conf:
+    file: ./infra/docker/php/php-fpm.d/www.local.conf
+  nginx_local_conf:
+    file: ./infra/docker/nginx/nginx.local.conf
+
+volumes:
+  db-store:
+  psysh-store:

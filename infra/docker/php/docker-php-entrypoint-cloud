@@ -1,0 +1,44 @@
+#!/bin/sh
+set -e
+
+wait_mysql_ready() {
+  php >&2 << 'EOD'
+<?php
+while (true) {
+  try {
+    new PDO(
+      "mysql:host={$_ENV['DB_HOST']};port={$_ENV['DB_PORT']};dbname={$_ENV['DB_DATABASE']}",
+      $_ENV['DB_USERNAME'],
+      $_ENV['DB_PASSWORD'],
+    );
+    exit;
+  } catch (PDOException) {
+    echo "Waiting MySQL ready...\n";
+    sleep(1);
+  }
+}
+EOD
+}
+
+php artisan config:cache &
+php artisan route:cache &
+php artisan blade:compile &
+
+wait_mysql_ready && php artisan migrate:fresh --seed --force &
+
+{
+  while { phoo --fcgi tcp://localhost:9000 \
+               --http localhost:8002 \
+               --root /workspace/public & }; \
+    sleep 1; \
+    ! pgrep phoo; do
+    echo >&2 'Waiting phoo ready...'
+  done
+
+  php artisan opcache:compile --force
+} &
+
+# set newrelic.license directive from $NEW_RELIC_LICENSE_KEY
+set -- "$@" -d"newrelic.license=${NEW_RELIC_LICENSE_KEY}"
+
+exec docker-php-entrypoint "$@"

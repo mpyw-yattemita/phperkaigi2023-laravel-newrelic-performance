@@ -1,0 +1,20 @@
+# php artisan key:generate --show で生成した値を貼り付け
+export APP_KEY=
+
+# ホスト側に露出するポートを指定
+export WEB_PUBLISHED_PORT=8000
+export DB_PUBLISHED_PORT=3306
+
+# New Relic セットアップで得られるライセンスキーを貼り付け
+export NEW_RELIC_LICENSE_KEY=
+export NEW_RELIC_ENABLED=false
+
+# XDebug
+# serverName=* の部分に IDE 側で設定したサーバ名を貼り付け
+export XDEBUG_ENABLED=false
+export PHP_IDE_CONFIG=serverName=
+
+# Vite コンパイル用
+# コンパイル時に置換してほしい環境変数を "VITE_" プレフィクス付きで列挙
+export VITE_GITHUB_URL=https://github.com/mpyw-yattemita/phperkaigi2023-laravel-newrelic-performance
+export VITE_NEW_RELIC_URL=https://one.newrelic.com/nr1-core

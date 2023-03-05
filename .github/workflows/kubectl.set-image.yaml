@@ -1,0 +1,21 @@
+name: Kubectl Set Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  kubectl-set-image:
+    uses: ./.github/workflows/kubectl.yaml
+    with:
+      kubectl: set image
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
