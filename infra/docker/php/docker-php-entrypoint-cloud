@@ -41,4 +41,7 @@ wait_mysql_ready && php artisan migrate:fresh --seed --force &
 # set newrelic.license directive from $NEW_RELIC_LICENSE_KEY
 set -- "$@" -d"newrelic.license=${NEW_RELIC_LICENSE_KEY}"
 
+# set newrelic.transaction_tracer.detail directive from $NEW_RELIC_TRANSACTION_TRACER_DETAIL
+set -- "$@" -d"newrelic.transaction_tracer.detail=${NEW_RELIC_TRANSACTION_TRACER_DETAIL}"
+
 exec docker-php-entrypoint "$@"
