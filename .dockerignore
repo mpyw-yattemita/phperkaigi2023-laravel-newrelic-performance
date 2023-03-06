@@ -5,10 +5,10 @@
 !/src/bootstrap/cache/.gitignore
 !/src/config
 !/src/database
+!/src/lang
 !/src/public/favicon.ico
 !/src/public/index.php
 !/src/public/robots.txt
-!/src/resources/lang
 !/src/resources/css
 !/src/resources/ts
 !/src/resources/views
