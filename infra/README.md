@@ -10,17 +10,18 @@ Docker および Docker Compose を使用します。
 
 [compose.yaml](../compose.yaml) にハードコーディングされたもの以外に関しては，環境変数の用意が必要です。 [.envrc.example](../.envrc.example) に書かれているものを用意してください。
 
-| 環境変数                    | デフォルト値        | 必須  | 備考                                            |
-|:------------------------|:--------------|:---:|:----------------------------------------------|
-| `APP_KEY`               |               |  ✅  | `php artisan key:generate --show` で生成した値を貼り付け |
-| `WEB_PUBLISHED_PORT`    | `8000`        |     | ホスト側に Nginx が公開するポート                          |
-| `DB_PUBLISHED_PORT`     | `3306`        |     | ホスト側に MySQL が公開するポート                          |
-| `NEW_RELIC_LICENSE_KEY` | `""`          |     | New Relic のライセンスキー                            |
-| `NEW_RELIC_ENABLED`     | `false`       |     | New Relic を有効化するかどうか                          |
-| `XDEBUG_ENABLED`        | `false`       |     | XDebug を有効化するかどうか                             |
-| `PHP_IDE_CONFIG`        | `serverName=` |     | XDebug 用の IDE の設定。サーバ名を設定する必要がある              |
-| `VITE_GITHUB_URL`       | (省略)          |     | Vite でビルドしたフロントエンドに仕込まれる GitHub リポジトリへのリンク    |
-| `VITE_NEW_RELIC_URL`    | (省略)          |     | Vite でビルドしたフロントエンドに仕込まれる New Relic コンソールへのリンク |
+| 環境変数                                  | デフォルト値        | 必須  | 備考                                            |
+|:--------------------------------------|:--------------|:---:|:----------------------------------------------|
+| `APP_KEY`                             |               |  ✅  | `php artisan key:generate --show` で生成した値を貼り付け |
+| `WEB_PUBLISHED_PORT`                  | `8000`        |     | ホスト側に Nginx が公開するポート                          |
+| `DB_PUBLISHED_PORT`                   | `3306`        |     | ホスト側に MySQL が公開するポート                          |
+| `NEW_RELIC_LICENSE_KEY`               | `""`          |     | New Relic のライセンスキー                            |
+| `NEW_RELIC_ENABLED`                   | `false`       |     | New Relic を有効化するかどうか                          |
+| `NEW_RELIC_TRANSACTION_TRACER_DETAIL` | `1`           |     | New Relic で全ての関数呼び出しの自動トレースを行うか（負荷あり）         |
+| `XDEBUG_ENABLED`                      | `false`       |     | XDebug を有効化するかどうか                             |
+| `PHP_IDE_CONFIG`                      | `serverName=` |     | XDebug 用の IDE の設定。サーバ名を設定する必要がある              |
+| `VITE_GITHUB_URL`                     | (省略)          |     | Vite でビルドしたフロントエンドに仕込まれる GitHub リポジトリへのリンク    |
+| `VITE_NEW_RELIC_URL`                  | (省略)          |     | Vite でビルドしたフロントエンドに仕込まれる New Relic コンソールへのリンク |
 
 ## クラウド環境
 

@@ -8,6 +8,7 @@ export DB_PUBLISHED_PORT=3306
 # New Relic セットアップで得られるライセンスキーを貼り付け
 export NEW_RELIC_LICENSE_KEY=
 export NEW_RELIC_ENABLED=false
+export NEW_RELIC_TRANSACTION_TRACER_DETAIL=1
 
 # XDebug
 # serverName=* の部分に IDE 側で設定したサーバ名を貼り付け
