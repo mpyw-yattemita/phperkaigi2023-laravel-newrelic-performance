@@ -62,6 +62,10 @@ spec:
                 secretKeyRef:
                   key: license_key
                   name: php-laravel
+            - name: NEW_RELIC_ENABLED
+              value: "${K8S_NEW_RELIC_ENABLED}"
+            - name: NEW_RELIC_TRANSACTION_TRACER_DETAIL
+              value: "${K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL}"
       volumes:
         - name: nginx-conf
           configMap:

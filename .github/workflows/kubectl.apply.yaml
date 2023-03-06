@@ -2,6 +2,23 @@ name: Kubectl Apply
 
 on:
   workflow_dispatch:
+    inputs:
+      NEW_RELIC_ENABLED:
+        description: newrelic.enabled
+        required: true
+        default: true
+        type: choice
+        options:
+          - true
+          - false
+      NEW_RELIC_TRANSACTION_TRACER_DETAIL:
+        description: newrelic.transaction_tracer.detail
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '0'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -12,6 +29,8 @@ jobs:
     uses: ./.github/workflows/kubectl.yaml
     with:
       kubectl: apply
+      K8S_NEW_RELIC_ENABLED: ${{ inputs.NEW_RELIC_ENABLED }}
+      K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL: ${{ inputs.NEW_RELIC_TRANSACTION_TRACER_DETAIL }}
     secrets: inherit
     permissions:
       id-token: write
