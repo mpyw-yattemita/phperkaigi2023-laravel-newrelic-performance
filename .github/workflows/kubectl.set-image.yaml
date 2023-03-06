@@ -5,6 +5,15 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      NEW_RELIC_TRANSACTION_TRACER_DETAIL:
+        description: newrelic.transaction_tracer.detail
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '0'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -15,6 +24,7 @@ jobs:
     uses: ./.github/workflows/kubectl.yaml
     with:
       kubectl: set image
+      K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL: ${{ inputs.NEW_RELIC_TRANSACTION_TRACER_DETAIL || '1' }}
     secrets: inherit
     permissions:
       id-token: write

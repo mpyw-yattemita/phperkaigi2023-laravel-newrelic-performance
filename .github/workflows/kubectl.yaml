@@ -15,6 +15,9 @@ on:
       K8S_LARAVEL_APP_URL:
         type: string
         default: ${{ vars.K8S_LARAVEL_APP_URL }}
+      K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL:
+        type: string
+        required: true
     secrets:
       IAM_ROLE_ARN:
         required: true
@@ -111,6 +114,7 @@ jobs:
         env:
           K8S_IMAGE_REPOSITORY_PHP_LARAVEL: ${{ secrets.K8S_IMAGE_REPOSITORY_PHP_LARAVEL }}
           K8S_LARAVEL_APP_URL: ${{ inputs.K8S_LARAVEL_APP_URL }}
+          K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL: ${{ inputs.K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL }}
           K8S_SECRET_BASE64_MYSQL_PASSWORD: ${{ secrets.K8S_SECRET_BASE64_MYSQL_PASSWORD }}
           K8S_SECRET_BASE64_MYSQL_ROOT_PASSWORD: ${{ secrets.K8S_SECRET_BASE64_MYSQL_ROOT_PASSWORD }}
           K8S_SECRET_BASE64_LARAVEL_ENCRYPTION_KEY: ${{ secrets.K8S_SECRET_BASE64_LARAVEL_ENCRYPTION_KEY }}
