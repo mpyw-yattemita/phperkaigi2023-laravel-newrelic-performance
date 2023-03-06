@@ -46,6 +46,7 @@ Docker でビルドしたイメージを Kubernetes 環境にて使用します�
 |:-------------------------------------------|:-------------------------------------------------------------------------------------------------|
 | `K8S_IMAGE_REPOSITORY_PHP_LARAVEL`         | Laravel をバンドルした PHP イメージを管理するリポジトリ                                                               |
 | `K8S_LARAVEL_APP_URL`                      | Web に公開後にアクセスできる実際のドメインを用いた URL (Origin)                                                         |
+| `K8S_NEW_RELIC_ENABLED`                    | New Relic インテグレーションを有効にするか                                                                       |
 | `K8S_NEW_RELIC_TRANSACTION_TRACER_DETAIL`  | New Relic で全ての関数呼び出しの自動トレースを行うか（負荷あり）                                                            |
 | `K8S_SECRET_BASE64_MYSQL_PASSWORD`         | BASE 64 エンコードされた MySQL のパスワード                                                                    | 
 | `K8S_SECRET_BASE64_MYSQL_ROOT_PASSWORD`    | BASE 64 エンコードされた MySQL のルートパスワード                                                                 |
