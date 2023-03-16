@@ -8,6 +8,8 @@ return [
         'Accept' => 'application/json',
     ],
     'directories' => [
+        // 無期限キャッシュでアプリケーションコードを読み込む
+        // （ゼロダウンタイムで破棄可能）
         base_path('app'),
         base_path('bootstrap'),
         base_path('config'),
@@ -15,9 +17,11 @@ return [
         base_path('public'),
         base_path('routes'),
         base_path('storage/framework/views'),
-        base_path('vendor/asm89/stack-cors'),
+    ],
+    'preload_directories' => [
+        // プリロードでライブラリコードを読み込む
+        // （真の永続キャッシュ・破棄不能）
         base_path('vendor/composer'),
-        base_path('vendor/fruitcake/laravel-cors'),
         base_path('vendor/laravel/framework'),
         base_path('vendor/monolog'),
         base_path('vendor/nesbot/carbon'),
