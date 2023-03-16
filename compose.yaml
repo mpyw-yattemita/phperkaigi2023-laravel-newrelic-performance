@@ -6,7 +6,7 @@ services:
       dockerfile: ./infra/docker/php/Dockerfile
       target: php_fpm_customized_with_xdebug
       args:
-        NEW_RELIC_AGENT_VERSION: 10.6.0.318
+        NEW_RELIC_AGENT_VERSION: 10.7.0.319
         VITE_GITHUB_URL: ${VITE_GITHUB_URL:-https://github.com/mpyw-yattemita/phperkaigi2023-laravel-newrelic-performance}
         VITE_NEW_RELIC_URL: ${VITE_NEW_RELIC_URL:-https://one.newrelic.com/nr1-core}
     entrypoint: docker-php-entrypoint-local
