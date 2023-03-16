@@ -82,7 +82,7 @@ jobs:
           cache-to: type=gha,mode=max
           # このオプションは JavaScript でパースされており，シェルのパース規則と異なるので，意図的にダブルクオートは使わない
           build-args: |
-            NEW_RELIC_AGENT_VERSION=10.6.0.318
+            NEW_RELIC_AGENT_VERSION=10.7.0.319
             VITE_GITHUB_URL=${{ inputs.VITE_GITHUB_URL }}
             VITE_NEW_RELIC_URL=${{ inputs.VITE_NEW_RELIC_URL }}
           tags: |
