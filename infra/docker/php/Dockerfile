@@ -1,8 +1,3 @@
-FROM golang:1.19 as phoo_build
-
-RUN apt update -y
-RUN go install github.com/alash3al/phoo@latest
-
 FROM php:8.1-fpm-bullseye AS php_fpm_customized
 
 WORKDIR /workspace
@@ -18,7 +13,7 @@ ENV TZ=UTC \
   COMPOSER_HOME=/composer
 
 # phoo
-COPY --from=phoo_build /go/bin/phoo /usr/bin/phoo
+COPY --from=ghcr.io/alash3al/phoo:2.1.4 /usr/bin/phoo /usr/bin/phoo
 
 # Composer
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
