@@ -7,13 +7,13 @@
         "ext-json": "*",
         "appstract/laravel-opcache": "^4.0",
         "guzzlehttp/guzzle": "^7.5",
-        "laravel/framework": "^9.51",
+        "laravel/framework": "^10.0",
         "laravel/tinker": "^2.8"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.13",
-        "spatie/laravel-ignition": "^1.4",
-        "nunomaduro/collision": "^6.3"
+        "spatie/laravel-ignition": "^2.0",
+        "nunomaduro/collision": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -40,6 +40,5 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 }
