@@ -2,7 +2,7 @@
 
 ## スライド
 
-後ほどリンクを掲載
+- [推測するな、計測せよ New Relic × Laravel 実践 - Speaker Deck](https://speakerdeck.com/mpyw/tui-ce-suruna-ji-ce-seyo-new-relic-x-laravel-shi-jian?slide=11)
 
 ## 必要なツール
 
