@@ -151,3 +151,13 @@ jobs:
           user: "${{ github.actor }}"
           description: "${{ github.event.head_commit.message }}"
           commit: "${{ github.sha }}"
+
+      - name: Export Workflow Trace
+        uses: inception-health/otel-export-trace-action@latest
+        with:
+          jobName: ${{ github.job }}
+          otlpEndpoint: ${{ secrets.OTLP_ENDPOINT }}
+          otlpHeaders: ${{ secrets.OTLP_HEADERS }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          runId: ${{ github.event.workflow_run.id }}
+          serviceName: ${{ github.job }}
