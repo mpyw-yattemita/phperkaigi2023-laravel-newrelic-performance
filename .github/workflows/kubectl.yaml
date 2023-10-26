@@ -152,6 +152,11 @@ jobs:
           description: "${{ github.event.head_commit.message }}"
           commit: "${{ github.sha }}"
 
+  otel-export:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: kubectl
+    steps:
       - name: Export Workflow Trace
         uses: inception-health/otel-export-trace-action@latest
         if: always()
