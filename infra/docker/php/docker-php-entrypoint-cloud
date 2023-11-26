@@ -27,7 +27,7 @@ php artisan blade:compile &
 wait_mysql_ready && php artisan migrate:fresh --seed --force &
 
 {
-  while { phoo --fcgi tcp://localhost:9000 \
+  while { phoo --entrypoint tcp://localhost:9000 \
                --http localhost:8002 \
                --root /workspace/public & }; \
     sleep 1; \
